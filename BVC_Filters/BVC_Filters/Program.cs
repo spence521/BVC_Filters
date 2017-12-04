@@ -12,7 +12,6 @@ namespace BVC_Filters
         static void Main(string[] args)
         {
             StreamReader Train;
-            StreamReader Test;
             Data data;
             if (args.Length == 0)
             {
@@ -22,8 +21,7 @@ namespace BVC_Filters
             else if (args.Length > 1) //at least two arguments
             {
                 Train = File.OpenText(args[0]);
-                Test = File.OpenText(args[1]);
-                data = new Data(Train, Test);
+                data = new Data(Train);
             }
         }
     }

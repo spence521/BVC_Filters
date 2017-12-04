@@ -12,11 +12,11 @@ namespace BVC_Filters
         public Dictionary<string, string> Training_Data { get; private set; }
         public Dictionary<string, string> Test_Data { get; private set; }
 
-        public Data(StreamReader r, StreamReader r2)
+        public Data(StreamReader r)
         {
             Training_Data = new Dictionary<string, string>();
             Test_Data = new Dictionary<string, string>();
-            SetData(r, r2);
+            SetData(r);
         }
 
         public void SetData(StreamReader reader, StreamReader reader_2 = null)
