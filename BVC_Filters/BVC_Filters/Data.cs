@@ -10,22 +10,31 @@ namespace BVC_Filters
 {
     public class Data
     {
-        public Dictionary<string, string> Training_Data { get; private set; }
-        public Dictionary<string, string> Test_Data { get; private set; }
-
-        public Data(StreamReader r)
+        public static void GetData(string[] data)
         {
-            Training_Data = new Dictionary<string, string>();
-            Test_Data = new Dictionary<string, string>();
-            SetData(r);
-        }
+            Dictionary<string, string> Training_Data = new Dictionary<string, string>();
+            Regex header = new Regex(@".*-.*-[\d]{4}");
+            string curr_id = "";
+            List<string> content = new List<string>();
+            foreach(string line in data)
+            {
+                if (header.IsMatch(line))
+                {
+                    if (string.IsNullOrEmpty(curr_id))
+                        curr_id = header.Match(line).Value;
+                    else
+                    {
+                        Training_Data.Add(curr_id, string.Join(" ", content.ToArray()));
+                        curr_id = header.Match(line).Value;
+                    }
+                    content = new List<string>();
+                } else
+                {
+                    content.Add(line);
+                }
+            }
 
-        public void SetData(StreamReader reader)
-        {
-
-            // DEV - MUC3 - 0001(NOSC)
-            Regex header = new Regex(@".*-.*-[\d]+");
-            //foreach(string line in reader.)
+            return Training_Data;
         }
     }
 }
