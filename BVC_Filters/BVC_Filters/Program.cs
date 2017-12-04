@@ -12,6 +12,7 @@ namespace BVC_Filters
         static void Main(string[] args)
         {
             Data data = new Data(File.OpenText("..\\..\\data.txt"));
+            BloomFilter p = new BloomFilter();
             Console.ReadKey();
         }
     }
