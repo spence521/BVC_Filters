@@ -10,7 +10,7 @@ namespace BVC_Filters
 {
     public class Data
     {
-        public static void GetData(string[] data)
+        public static Dictionary<string,string> GetData(string[] data)
         {
             Dictionary<string, string> Training_Data = new Dictionary<string, string>();
             Regex header = new Regex(@".*-.*-[\d]{4}");

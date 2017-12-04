@@ -12,11 +12,12 @@ namespace BVC_Filters
         static void Main(string[] args)
         {
             Dictionary<string, string> data = Data.GetData(File.ReadAllLines("..\\..\\data.txt"));
-            foreach(var k in data)
-            {
-                Console.WriteLine(k.Key);
-                Console.WriteLine(k.Value);
-            }
+            //foreach(var k in data)
+            //{
+            //    Console.WriteLine(k.Key);
+            //    Console.WriteLine(k.Value);
+            //}
+            BloomFilter p = new BloomFilter(data);
             Console.ReadKey();
         }
     }
