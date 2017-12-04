@@ -11,18 +11,8 @@ namespace BVC_Filters
     {
         static void Main(string[] args)
         {
-            StreamReader Train;
-            Data data;
-            if (args.Length == 0)
-            {
-                System.Console.WriteLine("Please enter a file argument.");
-                return;
-            }
-            else if (args.Length > 1) //at least two arguments
-            {
-                Train = File.OpenText(args[0]);
-                data = new Data(Train);
-            }
+            Data data = new Data(File.OpenText("..\\..\\data.txt"));
+            Console.ReadKey();
         }
     }
 }
