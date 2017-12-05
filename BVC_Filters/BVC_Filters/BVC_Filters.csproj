@@ -44,7 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BloomFilter.cs" />
+    <Compile Include="CuckooFilter.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="Hasher.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
