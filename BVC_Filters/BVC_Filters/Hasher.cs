@@ -39,16 +39,20 @@ namespace BVC_Filters
 
         public static int MapInt(int hash, int upper_lim)
         {
-            int old_span = int.MaxValue;
-            int new_span = upper_lim;
-            float num = (float)hash / old_span;
-            int obj = (int)(num * new_span);
-
-            while (obj > upper_lim)
+            if(hash > upper_lim)
             {
-                obj = obj - upper_lim;
+                int old_span = int.MaxValue;
+                int new_span = upper_lim;
+                float num = (float)hash / old_span;
+                int obj = (int)(num * new_span);
+
+                while (obj > upper_lim)
+                {
+                    obj = obj - upper_lim;
+                }
+                return obj;
             }
-            return obj;
+            return hash;
         }
 
         public static int[] BloomHash(object obj, int upper_lim, int k = 10)

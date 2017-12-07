@@ -38,6 +38,11 @@ namespace BVC_Filters
             }
             return true;
         }
-        
+
+        public void Size()
+        {
+            Console.WriteLine("Size of bloom filter: " + size * sizeof(byte));
+        }
+
     }
 }
