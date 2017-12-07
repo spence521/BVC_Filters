@@ -13,41 +13,15 @@ namespace BVC_Filters
     {
         static void Main(string[] args)
         {
-            Dictionary<string, string> data = Data.GetData(File.ReadAllLines("..\\..\\data.txt"));
-            Hasher.size = 40000;
-            CuckooFilter cf = new CuckooFilter(Hasher.size);
-            int lim = 600;
-            int count = 0;
-            Stopwatch sw = null;
-            foreach (var key in data)
-            {
-                if (lim-- > 0)
-                {
-                    cf.Insert(key.Value);
-                }
-                else
-                {
-                    if(sw == null)
-                    {
-                        sw = new Stopwatch();
-                        sw.Start();
-                    }
-                    bool a = cf.Lookup(key.Value);
-                    if (a)
-                        count++;
-                }
-            }
-            sw.Stop();
-            Console.WriteLine("Time " + sw.ElapsedMilliseconds);
-            Console.WriteLine("Count " + count);
-            BinaryFormatter bf = new BinaryFormatter();
-            long size = 0;
-            using(Stream s = new MemoryStream())
-            {
-                bf.Serialize(s, cf.Filter);
-                size = s.Length;
-            }
-            Console.WriteLine("Size " + size);
+            List<UInt64> list = RandomNoGen.RandomList(10000);
+            CuckooFilter cf = new CuckooFilter();
+            list.ForEach(x => {
+                Console.WriteLine(x);
+                if(!cf.IsFull)
+                    cf.Insert(x);
+            });
+
+
             Console.ReadKey();
         }
     }

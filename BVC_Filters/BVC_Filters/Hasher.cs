@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace BVC_Filters
 {
@@ -13,37 +11,37 @@ namespace BVC_Filters
     {
         public static int size { get; set; }
 
-        public static string Fingerprint(object obj)
+        public static ulong Fingerprint(object obj)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            using(MemoryStream ms = new MemoryStream())
+            char[] str = obj.ToString().ToCharArray();
+            ulong hash = 5381;
+            foreach (int c in str)
             {
-                bf.Serialize(ms, obj);
-                MD5 hasher = MD5.Create();
-                byte[] hash = hasher.ComputeHash(ms);
-                return "" + (Int16)obj.GetHashCode();
-                //return BitConverter.ToString(hash);
+                hash = (ulong)c + (hash << 6) + (hash << 16) - hash;
             }
+            if (hash == 0)
+                hash++;
+            return hash;
         }
 
         public static int GetHash(object obj)
         {
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream())
+            char[] str = obj.ToString().ToCharArray();
+            int hash = 5381;
+            foreach(int c in str)
             {
-                bf.Serialize(ms, obj);
-                MD5 hasher = MD5.Create();
-                byte[] hash = hasher.ComputeHash(ms);
-                Int32 hash_ = BitConverter.ToInt32(hash, 0);
-                return MapInt((Int16)obj.GetHashCode());
-                //return MapInt(hash_);
+                hash = ((hash << 5) + hash) + c;
             }
-        }
+            hash = Math.Abs(hash);
+            return MapInt(hash);
+        }   
 
-        public static int MapInt(Int32 hash)
+        public static int MapInt(int hash)
         {
-            float num = (float)Math.Abs(hash) / Int16.MaxValue * (size - 1);
-            return (int)num;
+            int old_span = int.MaxValue;
+            int new_span = int.MaxValue / 30;
+            int num = hash / old_span;
+            return num*new_span;
         }
     }
 }
