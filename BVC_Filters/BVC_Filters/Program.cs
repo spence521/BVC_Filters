@@ -13,7 +13,7 @@ namespace BVC_Filters
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Generating Train");
+            Console.WriteLine("Generating Train"); 
             List<UInt64> list = RandomNoGen.RandomList(1000);
             var test_list = list.GetRange(0, 100);
             Console.WriteLine("Generating Test");
