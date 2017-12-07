@@ -54,7 +54,7 @@ namespace BVC_Filters
 
             cf.Size();
             bf.Size();
-            Console.ReadKey();
+            //Console.ReadKey(); Do not need this on linux machine inside the script
         }
     }
 }
