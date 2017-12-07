@@ -33,19 +33,18 @@ namespace BVC_Filters
         private static Random rand = new Random();
         private int replace_counter = 500;
 
-        public ulong[] Filter { get; set; }
-        private ulong[] Filter_backup { get; set; }
-
-        private Dictionary<ulong, ulong> object_dictionary = new Dictionary<ulong, ulong>();
+        public ulong[,] Filter { get; set; }
+        private ulong[,] Filter_backup { get; set; }
 
         public bool IsFull = false;
         private int size;
+        private int bucket_size;
 
-
-        public CuckooFilter(int size)
+        public CuckooFilter(int size, int bucket_size=2)
         {
+            this.bucket_size = bucket_size;
             this.size = size;
-            Filter = new ulong[size + 1];
+            Filter = new ulong[size+1,bucket_size];
             Filter_backup = Filter;
         }
 
@@ -54,17 +53,17 @@ namespace BVC_Filters
             if (!IsFull)
             {
                 HashCombo i = new HashCombo(item, size, finger_only);
-                if (Filter[i.Hash1] != 0)
-                    if (Filter[i.Hash2] != 0)
+                if (IsEmptyAt(i.Hash1) == -1)
+                    if (IsEmptyAt(i.Hash2) == -1)
                         ReplaceAndPlace(i);
                     else
                     {
-                        Filter[i.Hash2] = i.Fingerprint;
+                        Filter[i.Hash2, IsEmptyAt(i.Hash2)] = i.Fingerprint;
                         replace_counter = 500;
                     }
                 else
                 {
-                    Filter[i.Hash1] = i.Fingerprint;
+                    Filter[i.Hash1, IsEmptyAt(i.Hash1)] = i.Fingerprint;
                     replace_counter = 500;
                 }
             }
@@ -73,7 +72,7 @@ namespace BVC_Filters
         private void ReplaceAndPlace(HashCombo item)
         {
             if (replace_counter == 500)
-                Filter.CopyTo(Filter_backup, 0);
+                Filter_backup = (ulong[,])Filter.Clone();
             if(replace_counter == 0)
             {
                 Filter = Filter_backup;
@@ -90,24 +89,45 @@ namespace BVC_Filters
             else
                 location = item.Hash2;
 
-            ulong original_obj = Filter[location];
-            Filter[location] = item.Fingerprint;
+            choice = rand.Next(0, bucket_size);
+            
+
+
+
+            ulong original_obj = Filter[location, choice];
+            Filter[location, choice] = item.Fingerprint;
             Insert(original_obj, finger_only:true);
         }
 
         public bool Lookup(ulong item)
         {
             HashCombo i = new HashCombo(item, size);
-            if (Filter[i.Hash1] == i.Fingerprint || Filter[i.Hash2] == i.Fingerprint)
+            if (BucketPosition(i.Hash1, i.Fingerprint) != -1 || BucketPosition(i.Hash2, i.Fingerprint) != -1)
             {
                 return true;
             }
             return false;
         }
 
+        public int IsEmptyAt(int bucket_number)
+        {
+            for (int i = 0; i < Filter.GetLength(1); i++)
+                if (Filter[bucket_number, i] == 0)
+                    return i;
+            return -1;
+        }
+
+        public int BucketPosition(int bucket_number, ulong item)
+        {
+            for (int i = 0; i < Filter.GetLength(1); i++)
+                if (Filter[bucket_number, i] == item)
+                    return i;
+            return -1;
+        }
+
         public void Size()
         {
-            Console.WriteLine("Size of cuckoo filter: " + size * sizeof(ulong));
+            Console.WriteLine("Size of cuckoo filter: " + size*bucket_size * sizeof(ulong));
         }
     }
 }

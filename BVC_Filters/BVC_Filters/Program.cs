@@ -14,13 +14,13 @@ namespace BVC_Filters
         static void Main(string[] args)
         {
             Console.WriteLine("Generating Train"); 
-            List<UInt64> list = RandomNoGen.RandomList(1000);
-            var test_list = list.GetRange(0, 100);
+            List<UInt64> list = RandomNoGen.RandomList(10000);
+            var test_list = list.GetRange(0, 1000);
             Console.WriteLine("Generating Test");
             test_list.AddRange(RandomNoGen.RandomList(20000));
 
             Console.WriteLine("Making Filter");
-            CuckooFilter cf = new CuckooFilter(10000/2);
+            CuckooFilter cf = new CuckooFilter(10000/2, 10);
             int fill_count = 0;
             list.ForEach(x =>
             {
@@ -31,7 +31,7 @@ namespace BVC_Filters
                 }
             });
             Console.WriteLine("Cuckoo Filter full after: " + fill_count);
-            BloomFilter bf = new BloomFilter(100000/2, hash_size: 5);
+            BloomFilter bf = new BloomFilter(100000, hash_size: 5);
             list.ForEach(x => bf.Insert(x));
 
 
