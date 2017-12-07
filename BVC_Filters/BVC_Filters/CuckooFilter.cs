@@ -36,7 +36,7 @@ namespace BVC_Filters
         public ulong[] Filter { get; set; }
         private ulong[] Filter_backup { get; set; }
 
-        private Dictionary<ulong, ulong> object_dictionary = new Dictionary<ulong, ulong>();
+        //private Dictionary<ulong, ulong> object_dictionary = new Dictionary<ulong, ulong>();
 
         public bool IsFull = false;
         private int size;
