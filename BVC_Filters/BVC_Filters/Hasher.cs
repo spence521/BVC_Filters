@@ -24,7 +24,7 @@ namespace BVC_Filters
             return hash;
         }
 
-        public static int GetHash(object obj)
+        public static int GetHash(object obj, int upper_lim)
         {
             char[] str = obj.ToString().ToCharArray();
             int hash = 5381;
@@ -33,15 +33,40 @@ namespace BVC_Filters
                 hash = ((hash << 5) + hash) + c;
             }
             hash = Math.Abs(hash);
-            return MapInt(hash);
+            hash = MapInt(hash, upper_lim);
+            return hash;
         }   
 
-        public static int MapInt(int hash)
+        public static int MapInt(int hash, int upper_lim)
         {
             int old_span = int.MaxValue;
-            int new_span = int.MaxValue / 30;
-            int num = hash / old_span;
-            return num*new_span;
+            int new_span = upper_lim;
+            float num = (float)hash / old_span;
+            int obj = (int)(num * new_span);
+
+            while (obj > upper_lim)
+            {
+                obj = obj - upper_lim;
+            }
+            return obj;
         }
+
+        public static int[] BloomHash(object obj, int upper_lim, int k = 10)
+        {
+            int[] hasharray = new int[k];
+            string hash = Fingerprint(obj).ToString();
+            int length = hash.Length;
+            ulong first = Convert.ToUInt64(hash.Substring(0, length / 2));
+            ulong second = Convert.ToUInt64(hash.Substring(length / 2));
+
+            for (int i=0; i<k; i++)
+            {
+                ulong temp = first + (ulong)i * second;
+                int hash_ = GetHash(temp, upper_lim);
+                hasharray[i] = hash_;
+            }
+            return hasharray;
+        }
+
     }
 }

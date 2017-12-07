@@ -15,12 +15,13 @@ namespace BVC_Filters
         public int Hash1 { get; set; }
         public int Hash2 { get; set; }
 
-        public HashCombo(ulong item)
+        public HashCombo(ulong item, int upper_lim)
         {
             Object = item;
+            //Fingerprint = Object;
             Fingerprint = Hasher.Fingerprint(item);
-            Hash1 = Hasher.GetHash(item);
-            Hash2 = Hash1 ^ Hasher.GetHash(Fingerprint);
+            Hash1 = Hasher.GetHash(item, upper_lim);
+            Hash2 = Hasher.MapInt(Hash1 ^ Hasher.GetHash(Fingerprint, upper_lim), upper_lim);
         }
     }
 
@@ -31,36 +32,40 @@ namespace BVC_Filters
 
         public ulong[] Filter { get; set; }
         public bool IsFull = false;
-
-        public CuckooFilter()
+        private int size;
+        public CuckooFilter(int size)
         {
-            Filter = new ulong[(int.MaxValue/30) + 1];
+            this.size = size;
+            Filter = new ulong[size + 1];
         }
 
         public void Insert(ulong item)
         {
-            if (IsFull)
-            {
-                Console.WriteLine("Filter Full LOL");
-                return;
-            }
-
-            HashCombo i = new HashCombo(item);
-            if (Filter[i.Hash1] == 0)
-                if (Filter[i.Hash2] == 0)
+            HashCombo i = new HashCombo(item, size);
+            if (Filter[i.Hash1] != 0)
+                if (Filter[i.Hash2] != 0)
                     ReplaceAndPlace(i);
                 else
-                    Filter[i.Hash2] = i.Object;
+                    Filter[i.Hash2] = i.Fingerprint;
             else
-                Filter[i.Hash1] = i.Object;
+                Filter[i.Hash1] = i.Fingerprint;
         }
+
+        public bool Lookup(ulong item)
+        {
+            HashCombo i = new HashCombo(item, size);
+            if (Filter[i.Hash1] == i.Fingerprint || Filter[i.Hash2] == i.Fingerprint)
+            {
+                return true;
+            }
+            return false;
+        }
+
 
         private void ReplaceAndPlace(HashCombo item)
         {
             if(replace_counter-- < 1)
             {
-                Console.WriteLine("Filter Full.");
-                IsFull = true;
                 replace_counter = 500;
                 return;
             }
@@ -73,7 +78,7 @@ namespace BVC_Filters
                 location = item.Hash2;
 
             ulong original_obj = Filter[location];
-            Filter[location] = item.Object;
+            Filter[location] = item.Fingerprint;
             Insert(original_obj);
         }
     }

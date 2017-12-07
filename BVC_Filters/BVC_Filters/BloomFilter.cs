@@ -8,52 +8,36 @@ namespace BVC_Filters
 {
     public class BloomFilter
     {
-        private static byte[] Bloom_Filter { get; set; }
-
-        public BloomFilter()
+        private byte[] Filter { get; set; }
+        private int hash_size;
+        private int size;
+        public BloomFilter(int filter_size, int hash_size = 10)
         {
-            Bloom_Filter = new byte[1000];
-            AddItem("test");
-            AddItem("test2");
-            AddItem("test3");
-            AddItem("test4");
-            AddItem("test5");
-
-            Console.WriteLine(PossiblyExists("whatever"));
-            Console.WriteLine(PossiblyExists("test"));
-            Console.WriteLine(PossiblyExists("test2"));
-            Console.WriteLine(PossiblyExists("test3"));
-            Console.WriteLine(PossiblyExists("test4"));
-            Console.WriteLine(PossiblyExists("test5"));
-            Console.WriteLine(PossiblyExists("test6"));
-            Console.ReadKey();
+            size = filter_size;
+            this.hash_size = hash_size;
+            Filter = new byte[filter_size + 1];
         }
 
-        static void AddItem(string item)
+        public void Insert(ulong item)
         {
-            int hash = Hash(item) & 0x7FFFFFFF; // strips signed bit
-            byte bit = (byte)(1 << (hash & 7)); // you have 8 bits
-            Bloom_Filter[hash % Bloom_Filter.Length] |= bit;
-        }
+            int[] hash_indices = Hasher.BloomHash(item, size, hash_size);
 
-        static bool PossiblyExists(string item)
-        {
-            int hash = Hash(item) & 0x7FFFFFFF;
-            byte bit = (byte)(1 << (hash & 7)); // you have 8 bits;
-            return (Bloom_Filter[hash % Bloom_Filter.Length] & bit) != 0;
-        }
-
-        private static int Hash(string item)
-        {
-            int result = 51;
-            for (int i = 0; i < item.Length; i++)
+            for (int i = 0; i < hash_indices.Length; i++)
             {
-                unchecked
-                {
-                    result *= item[i];
-                }
+                Filter[hash_indices[i]] = 1;
             }
-            return result;
         }
+
+        public bool Lookup(ulong item)
+        {
+            int[] hash_indices = Hasher.BloomHash(item, size, hash_size);
+            for (int i = 0; i < hash_indices.Length; i++)
+            {
+                if (Filter[hash_indices[i]] != 1)
+                    return false;
+            }
+            return true;
+        }
+        
     }
 }
