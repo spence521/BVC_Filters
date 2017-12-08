@@ -18,7 +18,7 @@ namespace BVC_Filters
             Filter = new byte[filter_size + 1];
         }
 
-        public void Insert(ulong item)
+        public void Insert(int item)
         {
             int[] hash_indices = Hasher.BloomHash(item, size, hash_size);
 
@@ -28,7 +28,7 @@ namespace BVC_Filters
             }
         }
 
-        public bool Lookup(ulong item)
+        public bool Lookup(int item)
         {
             int[] hash_indices = Hasher.BloomHash(item, size, hash_size);
             for (int i = 0; i < hash_indices.Length; i++)

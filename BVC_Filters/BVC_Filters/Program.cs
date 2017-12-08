@@ -13,16 +13,24 @@ namespace BVC_Filters
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Generating Train"); 
-            List<UInt64> list = RandomNoGen.RandomList(10000);
-            var test_list = list.GetRange(0, 1000);
-            Console.WriteLine("Generating Test");
-            test_list.AddRange(RandomNoGen.RandomList(20000));
+            Console.WriteLine("Generating filter members randomly."); 
+            List<int> to_add = RandomNoGen.RandomList(1000);
+            var test_list = to_add.GetRange(0, 200);
+            Console.WriteLine("Generating test elements.");
+            test_list.AddRange(RandomNoGen.RandomList(2000));
 
-            Console.WriteLine("Making Filters");
-            CuckooFilter cf = new CuckooFilter(100000/2, 4);
+            CuckooFilterRun(to_add, test_list);
+            BloomFilterRun(to_add, test_list);
+           
+            Console.ReadKey(); //Do not need this on linux machine inside the script
+        }
+
+        static void CuckooFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=1000, int bucket_size=4)
+        {
+            Console.WriteLine("Making cuckoo filter");
+            CuckooFilter cf = new CuckooFilter(filter_size, bucket_size);
             int fill_count = 0;
-            list.ForEach(x =>
+            filter_members.ForEach(x =>
             {
                 if (!cf.IsFull)
                 {
@@ -31,32 +39,36 @@ namespace BVC_Filters
                 }
             });
             Console.WriteLine("Cuckoo Filter full after: " + fill_count);
-            BloomFilter bf = new BloomFilter(100000, hash_size: 20);
-            list.ForEach(x => bf.Insert(x));
 
-
-            Console.WriteLine("Checking Filters. Should receive 1000 positives. Anything more than that is false");
             int counter_cf = 0;
-            int counter_bf = 0;
-            test_list.ForEach(x =>
+            test_elements.ForEach(x =>
             {
                 if (cf.Lookup(x))
                     counter_cf++;
             });
-            test_list.ForEach(x =>
+
+            cf.Size();
+            cf.LoadFactor();
+            Console.WriteLine("Cuckoo filter positives: " + counter_cf);
+        }
+
+        static void BloomFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=100000, int hash_size=1000)
+        {
+            BloomFilter bf = new BloomFilter(filter_size, hash_size: hash_size);
+            filter_members.ForEach(x => bf.Insert(x));
+
+
+            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that is false");
+            int counter_bf = 0;
+
+            test_elements.ForEach(x =>
             {
                 if (bf.Lookup(x))
                     counter_bf++;
             });
 
-            Console.WriteLine("Cuckoo filter positives: " + counter_cf);
             Console.WriteLine("Bloom filter positives: " + counter_bf);
-
-            cf.Size();
             bf.Size();
-
-            cf.LoadFactor();
-            Console.ReadKey(); //Do not need this on linux machine inside the script
         }
     }
 }

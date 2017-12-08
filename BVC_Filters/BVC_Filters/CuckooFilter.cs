@@ -10,12 +10,12 @@ namespace BVC_Filters
 
     public class HashCombo
     {
-        public ulong Object { get; set; }
-        public ulong Fingerprint { get; set; }
+        public int Object { get; set; }
+        public int Fingerprint { get; set; }
         public int Hash1 { get; set; }
         public int Hash2 { get; set; }
 
-        public HashCombo(ulong item, int upper_lim, bool finger_only=false)
+        public HashCombo(int item, int upper_lim, bool finger_only=false)
         {
             Object = item;
             //Fingerprint = Object;
@@ -33,8 +33,8 @@ namespace BVC_Filters
         private static Random rand = new Random();
         private int replace_counter = 500;
 
-        public ulong[,] Filter { get; set; }
-        private ulong[,] Filter_backup { get; set; }
+        public int[,] Filter { get; set; }
+        private int[,] Filter_backup { get; set; }
 
         public bool IsFull = false;
         private int size;
@@ -44,11 +44,11 @@ namespace BVC_Filters
         {
             this.bucket_size = bucket_size;
             this.size = size;
-            Filter = new ulong[size+1,bucket_size];
+            Filter = new int[size+1,bucket_size];
             Filter_backup = Filter;
         }
 
-        public void Insert(ulong item, bool finger_only=false)
+        public void Insert(int item, bool finger_only=false)
         {
             if (!IsFull)
             {
@@ -72,7 +72,7 @@ namespace BVC_Filters
         private void ReplaceAndPlace(HashCombo item)
         {
             if (replace_counter == 500)
-                Filter_backup = (ulong[,])Filter.Clone();
+                Filter_backup = (int[,])Filter.Clone();
             if(replace_counter == 0)
             {
                 Filter = Filter_backup;
@@ -94,12 +94,12 @@ namespace BVC_Filters
 
 
 
-            ulong original_obj = Filter[location, choice];
+            int original_obj = Filter[location, choice];
             Filter[location, choice] = item.Fingerprint;
             Insert(original_obj, finger_only:true);
         }
 
-        public bool Lookup(ulong item)
+        public bool Lookup(int item)
         {
             HashCombo i = new HashCombo(item, size);
             if (BucketPosition(i.Hash1, i.Fingerprint) != -1 || BucketPosition(i.Hash2, i.Fingerprint) != -1)
@@ -117,7 +117,7 @@ namespace BVC_Filters
             return -1;
         }
 
-        public int BucketPosition(int bucket_number, ulong item)
+        public int BucketPosition(int bucket_number, int item)
         {
             for (int i = 0; i < Filter.GetLength(1); i++)
                 if (Filter[bucket_number, i] == item)
