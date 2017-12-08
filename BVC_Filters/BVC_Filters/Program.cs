@@ -19,8 +19,8 @@ namespace BVC_Filters
             Console.WriteLine("Generating Test");
             test_list.AddRange(RandomNoGen.RandomList(20000));
 
-            Console.WriteLine("Making Filter");
-            CuckooFilter cf = new CuckooFilter(10000/2, 10);
+            Console.WriteLine("Making Filters");
+            CuckooFilter cf = new CuckooFilter(100000/2, 4);
             int fill_count = 0;
             list.ForEach(x =>
             {
@@ -31,11 +31,11 @@ namespace BVC_Filters
                 }
             });
             Console.WriteLine("Cuckoo Filter full after: " + fill_count);
-            BloomFilter bf = new BloomFilter(100000, hash_size: 5);
+            BloomFilter bf = new BloomFilter(100000, hash_size: 20);
             list.ForEach(x => bf.Insert(x));
 
 
-            Console.WriteLine("Checking Filter");
+            Console.WriteLine("Checking Filters. Should receive 1000 positives. Anything more than that is false");
             int counter_cf = 0;
             int counter_bf = 0;
             test_list.ForEach(x =>
@@ -49,12 +49,14 @@ namespace BVC_Filters
                     counter_bf++;
             });
 
-            Console.WriteLine(counter_cf);
-            Console.WriteLine(counter_bf);
+            Console.WriteLine("Cuckoo filter positives: " + counter_cf);
+            Console.WriteLine("Bloom filter positives: " + counter_bf);
 
             cf.Size();
             bf.Size();
-            //Console.ReadKey(); Do not need this on linux machine inside the script
+
+            cf.LoadFactor();
+            Console.ReadKey(); //Do not need this on linux machine inside the script
         }
     }
 }

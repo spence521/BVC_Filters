@@ -125,9 +125,22 @@ namespace BVC_Filters
             return -1;
         }
 
-        public void Size()
+        public int Size(bool display = true)
         {
-            Console.WriteLine("Size of cuckoo filter: " + size*bucket_size * sizeof(ulong));
+            if(display)
+                Console.WriteLine("Size of cuckoo filter: " + size*bucket_size * sizeof(ulong));
+            return size * bucket_size * sizeof(ulong);
         }
+
+        public void LoadFactor()
+        {
+            int filled = 0;
+            for (int i = 0; i < Filter.GetLength(0); i++)
+                for (int j = 0; j < Filter.GetLength(1); j++)
+                    if (Filter[i, j] == 0)
+                        filled++;
+            Console.WriteLine("Load factor: " + (float)filled / Size(false));
+        }
+
     }
 }
