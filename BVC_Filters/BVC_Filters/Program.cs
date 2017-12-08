@@ -18,8 +18,12 @@ namespace BVC_Filters
             var test_list = to_add.GetRange(0, 200);
             Console.WriteLine("Generating test elements.");
             test_list.AddRange(RandomNoGen.RandomList(2000));
+            Console.WriteLine("");
+            Console.WriteLine("");
 
             CuckooFilterRun(to_add, test_list);
+            Console.WriteLine("");
+            Console.WriteLine("");
             BloomFilterRun(to_add, test_list);
            
             Console.ReadKey(); //Do not need this on linux machine inside the script
@@ -39,7 +43,7 @@ namespace BVC_Filters
                 }
             });
             Console.WriteLine("Cuckoo Filter full after: " + fill_count);
-
+            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that is false");
             int counter_cf = 0;
             test_elements.ForEach(x =>
             {
@@ -54,13 +58,13 @@ namespace BVC_Filters
 
         static void BloomFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=100000, int hash_size=1000)
         {
+            Console.WriteLine("Making bloom filter");
             BloomFilter bf = new BloomFilter(filter_size, hash_size: hash_size);
             filter_members.ForEach(x => bf.Insert(x));
 
 
             Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that is false");
             int counter_bf = 0;
-
             test_elements.ForEach(x =>
             {
                 if (bf.Lookup(x))
