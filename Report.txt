@@ -1,0 +1,39 @@
+\documentclass[12pt]{article}
+
+\usepackage{fullpage}
+\usepackage{amsmath, amssymb, amsthm}
+
+\newtheorem{claim}{Claim}
+\newtheorem{lemma}{Lemma}
+\usepackage{blkarray}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{enumerate}
+\usepackage{booktabs}
+
+\newcolumntype{C}{>$c<$}
+
+\title{Bloom Filters vs Cuckoo Filters}
+\author{Names: Spencer Fronberg, Kiran Gadhave, Ashish Gutpa}
+
+\begin{document}
+\maketitle
+
+\section{Data Used}
+Initially, we planned to use data that we found on the web that included multiple different articles. There were about a total of 1300 articles. We then realized that we did not have enough data to show what we wanted as in if Cuckoo Filters are better than Bloom Filters. We then decided to generate our own data by creating a random number generator class that generates our random bytes that is represented as our data.
+\section{Bloom Filters}
+
+
+\newpage
+\section{Cuckoo Filters}
+Your solution here.
+
+\newpage
+\section{Which is Better}
+Your solution here.
+
+%\newpage
+%\section{Problem 4}
+%Your solution here.
+\end{document}
