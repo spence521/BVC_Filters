@@ -10,12 +10,12 @@ namespace BVC_Filters
 
     public class HashCombo
     {
-        public ulong Object { get; set; }
-        public ulong Fingerprint { get; set; }
+        public int Object { get; set; }
+        public int Fingerprint { get; set; }
         public int Hash1 { get; set; }
         public int Hash2 { get; set; }
 
-        public HashCombo(ulong item, int upper_lim, bool finger_only=false)
+        public HashCombo(int item, int upper_lim, bool finger_only=false)
         {
             Object = item;
             //Fingerprint = Object;
@@ -33,38 +33,37 @@ namespace BVC_Filters
         private static Random rand = new Random();
         private int replace_counter = 500;
 
-        public ulong[] Filter { get; set; }
-        private ulong[] Filter_backup { get; set; }
-
-        //private Dictionary<ulong, ulong> object_dictionary = new Dictionary<ulong, ulong>();
+        public int[,] Filter { get; set; }
+        private int[,] Filter_backup { get; set; }
 
         public bool IsFull = false;
         private int size;
+        private int bucket_size;
 
-
-        public CuckooFilter(int size)
+        public CuckooFilter(int size, int bucket_size=2)
         {
+            this.bucket_size = bucket_size;
             this.size = size;
-            Filter = new ulong[size + 1];
+            Filter = new int[size+1,bucket_size];
             Filter_backup = Filter;
         }
 
-        public void Insert(ulong item, bool finger_only=false)
+        public void Insert(int item, bool finger_only=false)
         {
             if (!IsFull)
             {
                 HashCombo i = new HashCombo(item, size, finger_only);
-                if (Filter[i.Hash1] != 0)
-                    if (Filter[i.Hash2] != 0)
+                if (IsEmptyAt(i.Hash1) == -1)
+                    if (IsEmptyAt(i.Hash2) == -1)
                         ReplaceAndPlace(i);
                     else
                     {
-                        Filter[i.Hash2] = i.Fingerprint;
+                        Filter[i.Hash2, IsEmptyAt(i.Hash2)] = i.Fingerprint;
                         replace_counter = 500;
                     }
                 else
                 {
-                    Filter[i.Hash1] = i.Fingerprint;
+                    Filter[i.Hash1, IsEmptyAt(i.Hash1)] = i.Fingerprint;
                     replace_counter = 500;
                 }
             }
@@ -73,7 +72,7 @@ namespace BVC_Filters
         private void ReplaceAndPlace(HashCombo item)
         {
             if (replace_counter == 500)
-                Filter.CopyTo(Filter_backup, 0);
+                Filter_backup = (int[,])Filter.Clone();
             if(replace_counter == 0)
             {
                 Filter = Filter_backup;
@@ -90,24 +89,58 @@ namespace BVC_Filters
             else
                 location = item.Hash2;
 
-            ulong original_obj = Filter[location];
-            Filter[location] = item.Fingerprint;
+            choice = rand.Next(0, bucket_size);
+            
+
+
+
+            int original_obj = Filter[location, choice];
+            Filter[location, choice] = item.Fingerprint;
             Insert(original_obj, finger_only:true);
         }
 
-        public bool Lookup(ulong item)
+        public bool Lookup(int item)
         {
             HashCombo i = new HashCombo(item, size);
-            if (Filter[i.Hash1] == i.Fingerprint || Filter[i.Hash2] == i.Fingerprint)
+            if (BucketPosition(i.Hash1, i.Fingerprint) != -1 || BucketPosition(i.Hash2, i.Fingerprint) != -1)
             {
                 return true;
             }
             return false;
         }
 
-        public void Size()
+        public int IsEmptyAt(int bucket_number)
         {
-            Console.WriteLine("Size of cuckoo filter: " + size * sizeof(ulong));
+            for (int i = 0; i < Filter.GetLength(1); i++)
+                if (Filter[bucket_number, i] == 0)
+                    return i;
+            return -1;
         }
+
+        public int BucketPosition(int bucket_number, int item)
+        {
+            for (int i = 0; i < Filter.GetLength(1); i++)
+                if (Filter[bucket_number, i] == item)
+                    return i;
+            return -1;
+        }
+
+        public int Size(bool display = true)
+        {
+            if(display)
+                Console.WriteLine("Size of cuckoo filter: " + size*bucket_size * sizeof(ulong));
+            return size * bucket_size * sizeof(ulong);
+        }
+
+        public void LoadFactor()
+        {
+            int filled = 0;
+            for (int i = 0; i < Filter.GetLength(0); i++)
+                for (int j = 0; j < Filter.GetLength(1); j++)
+                    if (Filter[i, j] == 0)
+                        filled++;
+            Console.WriteLine("Load factor: " + (float)filled / Size(false));
+        }
+
     }
 }

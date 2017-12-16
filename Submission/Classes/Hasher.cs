@@ -11,16 +11,17 @@ namespace BVC_Filters
     {
         public static int size { get; set; }
 
-        public static ulong Fingerprint(object obj)
+        public static int Fingerprint(object obj) 
         {
             char[] str = obj.ToString().ToCharArray();
-            ulong hash = 5381;
+            int hash = 5381;
             foreach (int c in str)
             {
-                hash = (ulong)c + (hash << 6) + (hash << 16) - hash;
+                hash = (int)(c + (hash << 6) + (hash << 16) - hash);
             }
             if (hash == 0)
                 hash++;
+
             return hash;
         }
 
@@ -60,12 +61,12 @@ namespace BVC_Filters
             int[] hasharray = new int[k];
             string hash = Fingerprint(obj).ToString();
             int length = hash.Length;
-            ulong first = Convert.ToUInt64(hash.Substring(0, length / 2));
-            ulong second = Convert.ToUInt64(hash.Substring(length / 2));
+            int first = Convert.ToInt32(hash.Substring(0, length / 2));
+            int second = Convert.ToInt32(hash.Substring(length / 2));
 
             for (int i=0; i<k; i++)
             {
-                ulong temp = first + (ulong)i * second;
+                int temp = first + (int)i * second;
                 int hash_ = GetHash(temp, upper_lim);
                 hasharray[i] = hash_;
             }
