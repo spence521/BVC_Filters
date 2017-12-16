@@ -109,6 +109,22 @@ namespace BVC_Filters
             return false;
         }
 
+        public void Delete(int item)
+        {
+            HashCombo i = new HashCombo(item, size);
+            if (BucketPosition(i.Hash1, i.Fingerprint) != -1)
+                ResetBucket(i.Hash1, i.Fingerprint);
+            if (BucketPosition(i.Hash2, i.Fingerprint) != -1)
+                ResetBucket(i.Hash2, i.Fingerprint);
+        }
+
+        public void ResetBucket(int bucket_number, int item)
+        {
+            for (int i = 0; i < Filter.GetLength(1); i++)
+                if (Filter[bucket_number, i] == item)
+                    Filter[bucket_number, i] = -1;
+        }
+
         public int IsEmptyAt(int bucket_number)
         {
             for (int i = 0; i < Filter.GetLength(1); i++)

@@ -29,7 +29,7 @@ namespace BVC_Filters
             Console.ReadKey(); //Do not need this on linux machine inside the script
         }
 
-        static void CuckooFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=1000, int bucket_size=4)
+        static void CuckooFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=2000, int bucket_size=4)
         {
             Console.WriteLine("Making cuckoo filter");
             CuckooFilter cf = new CuckooFilter(filter_size, bucket_size);
@@ -43,7 +43,7 @@ namespace BVC_Filters
                 }
             });
             Console.WriteLine("Cuckoo Filter full after: " + fill_count);
-            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that is false");
+            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that are false positives.");
             int counter_cf = 0;
             test_elements.ForEach(x =>
             {
@@ -52,18 +52,29 @@ namespace BVC_Filters
             });
 
             cf.Size();
-            cf.LoadFactor();
             Console.WriteLine("Cuckoo filter positives: " + counter_cf);
+
+            Console.WriteLine("Deleting first two elements from Cuckoo Filter");
+            cf.Delete(filter_members[0]);
+            cf.Delete(filter_members[1]);
+
+            counter_cf = 0;
+            test_elements.ForEach(x =>
+            {
+                if (cf.Lookup(x))
+                    counter_cf++;
+            });
+            Console.WriteLine("Cuckoo filter positives after deletion: " + counter_cf);
         }
 
-        static void BloomFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=100000, int hash_size=1000)
+        static void BloomFilterRun(List<int> filter_members, List<int> test_elements, int filter_size=100000, int hash_size=100)
         {
             Console.WriteLine("Making bloom filter");
             BloomFilter bf = new BloomFilter(filter_size, hash_size: hash_size);
             filter_members.ForEach(x => bf.Insert(x));
 
 
-            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that is false");
+            Console.WriteLine("Checking Filters. Should receive 200 positives. Anything more than that are false positives.");
             int counter_bf = 0;
             test_elements.ForEach(x =>
             {
